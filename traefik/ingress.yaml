@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: yy-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: default-stripprefix@kubernetescrd
+spec:
+  rules:
+  - host: yy.k8s                           
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: whales
+          servicePort: 80
+      - path: /app
+        backend:
+          serviceName: whales
+          servicePort: 80
+      - path: /whoami
+        backend:
+          serviceName: whoami
+          servicePort: 80
+  - host: admin.yy.k8s
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: traefik
+            servicePort: 8080
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /app
+      - /whoami

@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: whale-purple
+  labels:
+    app: whale
+spec:
+  containers:
+  - name: purple-whale
+    image: hcwxd/purple-whale
+    ports:
+    - name: http 
+      containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whales
+  labels:
+    app: whale
+spec:
+  selector:
+    app: whale
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
