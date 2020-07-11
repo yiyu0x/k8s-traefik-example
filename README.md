@@ -30,7 +30,7 @@ spec:
 ...
 ```
 
-避免不同 App 吃到不同的路由位置無法產生正確的回應（假設我們的服物入口都在根路徑 Ex: `app-foo/` ）。
+避免不同 App 吃到不同的路由位置無法產生正確的回應（假設我們的服務入口都在根路徑 Ex: `app-foo/` ）。
 
 但 Traefik 要達成這件事情必須透過 [Middleware](https://docs.traefik.io/middlewares/overview/) 這個組件（Traefik 定義的功能），簡單來說我們要把讀進來的 /path，strip 掉並且將導向到指定的 Service 上。
 
@@ -122,7 +122,7 @@ subjects:
     namespace: default
 ```
 
-接下來將 Traefik 本身跑起來：
+將 Traefik 本身跑起來：
 
 ```yaml
 apiVersion: v1
@@ -183,9 +183,6 @@ spec:
     - protocol: TCP
       name: admin
       port: 8080
-    - protocol: TCP
-      name: websecure
-      port: 4443
   selector:
     app: traefik
 ```
@@ -239,10 +236,12 @@ spec:
 
 要注意的重點有：
 - CRD 中的權限要記得 middwares 有被加進去。
-- Traefik 跑起來時要加上 `--providers.kubernetesingress`
+- 要使用 Ingress，Traefik 跑起來時要加上 `--providers.kubernetesingress`
 - 如果用 IngressRoute 跑，要加上 `--providers.kubernetescrd`
+- annotations 中 middleware 的名字最前面需要加上 namespace（本文使用 default）
+- 如果直接貼 Traefik 官網的 user-guides/crd-acme，要注意它並沒有加上 `--providers.kubernetesingress`，所以無法與 Ingress 正確綁定
+- 在 local 測試可以用 `kubectl port-forward svc/traefik foo-port:8080` 連到 dashboard 來 debug
 
 更多詳細設定可以參考 [user-guides/crd-acme](https://docs.traefik.io/user-guides/crd-acme/#ingressroute-definition)，以上的設定比較精簡，此文章只有留必要部分而已。
 
 完整的設定可以到 [GitHub Repo](https://github.com/yiyu0x/k8s-traefik-example) 上面看。
-
